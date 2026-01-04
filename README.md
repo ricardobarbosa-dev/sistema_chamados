@@ -140,10 +140,9 @@ Acesse: **http://127.0.0.1:8000/**
 
 ## 🧑‍💻 Autor
 
-Projeto desenvolvido por **Rick**  
+Projeto desenvolvido por **Ricardo Barbosa**  
 Foco em aprendizado profundo, regras de negócio e arquitetura limpa.
 
 ---
 
 ⭐ Se este projeto te ajudou, considere dar uma estrela no repositório!
-# ticket-system
