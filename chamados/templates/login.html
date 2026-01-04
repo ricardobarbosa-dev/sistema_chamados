@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'chamados/login.css' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex items-center justify-center">
+    <section class="bg-login">
+      <div class="login-card">
+        <h1 class="text-4xl font-bold mb-4 text-center">Sign In to Your Account</h1>
+        <h2 class="text-2xl font-300 mb-4 text-center">Enter your credentials below.</h2>
+
+        <form method="post">
+          {% csrf_token %}
+          <label>Username<input class="p-4 mb-10" type="text" autocomplete="username" name="username" placeholder="username" required /></label>
+          <label>Password<input class="p-4 mb-10" type="password" name="password" placeholder="************" required /></label>
+
+          <button class="btn-enter" type="submit">Entrar</button>
+        </form>
+        <div class="signup">
+          <a href="/register">Not a Member yet? <b>Sign up</b></a>
+          <a href="/password-reset">Forgot password?</a>
+        </div>
+        <br />
+
+        {# SUCCES DE LOGIN #}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="success-alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        {# ERROS DE LOGIN #}
+        {% if form.errors %}
+          <div class="error-alert">Username or Password incorrect!</div>
+        {% endif %}
+      </div>
+    </section>
+  </body>
+</html>

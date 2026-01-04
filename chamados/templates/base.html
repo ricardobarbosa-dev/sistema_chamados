@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ticket</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="{% static 'chamados/images/favicon.png' %}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 min-h-screen flex flex-col">
+
+<nav class="bg-blue-600 dark:bg-blue-900 text-white px-4 py-4 flex items-center justify-around">
+
+  <!-- Logo -->
+  <h1 class="font-bold text-lg">
+    <a href="/">Ticket</a>
+  </h1>
+
+  <!-- Desktop menu -->
+  <div class="hidden md:flex items-center gap-6">
+
+    <!-- Notifications -->
+    <div class="relative">
+      <button id="notifBtn" class="relative text-xl focus:outline-none">
+        🔔
+        {% if notificacoes_nao_lidas %}
+          <span class="absolute -top-2 -right-2 bg-red-600 text-xs px-1 rounded-full">
+            {{ notificacoes_nao_lidas }}
+          </span>
+        {% endif %}
+      </button>
+
+      <div
+        id="notifDropdown"
+        class="hidden absolute right-0 mt-2 w-80 bg-white text-gray-800 rounded shadow-lg z-50"
+      >
+        {% for n in notificacoes %}
+          {% if n.chamado and n.chamado.id %}
+            <a
+              href="{% url 'detalhe_chamado' n.chamado.id %}"
+              class="block px-4 py-3 border-b hover:bg-gray-100
+              {% if not n.lida %}bg-gray-50{% endif %}"
+            >
+          {% else %}
+            <div class="block px-4 py-3 border-b bg-gray-200 opacity-70">
+          {% endif %}
+
+            <p class="text-sm">{{ n.mensagem|safe }}</p>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ n.criada_em|date:"d/m/Y H:i" }}
+            </p>
+
+          {% if n.chamado and n.chamado.id %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        {% empty %}
+          <p class="p-4 text-center text-gray-500">Nenhuma notificação</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- User -->
+    <div class="relative group">
+      <span class="cursor-pointer font-semibold">
+        Olá, {{ request.user.username }}
+      </span>
+
+      <div
+        class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg
+        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+        transition-all z-50"
+      >
+        <a
+          href="{% url 'password_change' %}"
+          class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+        >
+          Alterar senha
+        </a>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button class="hover:underline">Logout</button>
+    </form>
+  </div>
+
+  <!-- Mobile hamburger -->
+  <button id="mobileMenuBtn" class="md:hidden text-2xl">
+    ☰
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobileMenu"
+     class="hidden md:hidden bg-blue-700 dark:bg-blue-800 text-white px-4 py-4 space-y-4">
+
+  <div class="flex items-center gap-2">
+    🔔
+    <span>Notificações</span>
+    {% if notificacoes_nao_lidas %}
+      <span class="bg-red-600 text-xs px-2 rounded-full">
+        {{ notificacoes_nao_lidas }}
+      </span>
+    {% endif %}
+  </div>
+
+  <div class="border-t border-blue-500 pt-3">
+    <p class="font-semibold">Olá, {{ request.user.username }}</p>
+
+    <a href="{% url 'password_change' %}"
+       class="block mt-2 underline">
+      Alterar senha
+    </a>
+  </div>
+
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button class="w-full bg-red-600 py-2 rounded font-semibold">
+      Logout
+    </button>
+  </form>
+</div>
+
+<main class="p-4 md:p-6 flex-1">
+  {% block content %}{% endblock %}
+</main>
+
+{% if messages %}
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-4">
+  {% for message in messages %}
+  <div
+    id="toast"
+    class="bg-green-300 text-gray-900 px-6 py-4 rounded shadow-lg w-80 max-w-[90vw] relative overflow-hidden"
+  >
+    <p class="font-semibold">{{ message }}</p>
+    <div class="absolute bottom-0 left-0 w-full h-1 bg-green-200">
+      <div id="loader" class="h-full bg-green-700"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<style>
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide {
+  animation: slideIn 0.4s ease-out;
+}
+</style>
+
+<script>
+/* MOBILE MENU — CORRIGIDO */
+const mobileMenuBtn = document.getElementById('mobileMenuBtn')
+const mobileMenu = document.getElementById('mobileMenu')
+
+mobileMenuBtn?.addEventListener('click', (e) => {
+  e.stopPropagation()
+  mobileMenu.classList.toggle('hidden')
+})
+
+/* NOTIFICAÇÕES */
+const notifBtn = document.getElementById('notifBtn')
+const notifDropdown = document.getElementById('notifDropdown')
+
+notifBtn?.addEventListener('click', (e) => {
+  e.stopPropagation()
+  notifDropdown.classList.toggle('hidden')
+})
+
+document.addEventListener('click', () => {
+  notifDropdown?.classList.add('hidden')
+})
+
+/* TOAST */
+const loader = document.getElementById('loader')
+const toast = document.getElementById('toast')
+
+if (loader && toast) {
+  loader.style.width = '100%'
+  loader.style.transition = 'width 10s linear'
+  setTimeout(() => loader.style.width = '0%', 50)
+  setTimeout(() => toast.remove(), 10000)
+}
+</script>
+
+</body>
+</html>

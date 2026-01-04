@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Register a new account</title>
+    <link rel="stylesheet" href="{% static 'chamados/login.css' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex items-center justify-center">
+    <section class="bg-login">
+      <div class="login-card">
+        <h1 class="text-4xl font-bold mb-4 text-center">Create Account</h1>
+        <h2 class="text-2xl font-300 mb-4 text-center">Enter your credentials below.</h2>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <label>Username<input class="p-4 mb-10" type="text" name="username" autocomplete="username" placeholder="username" maxlength="24" required /></label>
+
+          <label>E-mail<input class="p-4 mb-10" type="email" name="email" autocomplete="email" placeholder="email@exemplo.com" maxlength="130" required /></label>
+
+          <label>Senha<input class="p-4 mb-10" type="password" name="password1" autocomplete="new-password" placeholder="********" minlength="6" maxlength="20" required /></label>
+
+          <label>Confirmar senha<input class="p-4 mb-10" type="password" name="password2" autocomplete="new-password" placeholder="********" minlength="6" maxlength="20" required /></label>
+
+          <button class="btn-enter" type="submit">Create Account</button>
+        </form>
+        <br />
+        {% if form.errors %}
+          <div class="error-alert">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="signup">
+          <a href="{% url 'login' %}">Have an account? <b>Log in</b></a>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

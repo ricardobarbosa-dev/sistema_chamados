@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if request.user.is_staff or chamado.criado_por == request.user and chamado.status != 'fechado' %}
+
+<div class="max-w-xl mx-auto bg-gray-700 p-6 rounded shadow">
+  <h2 class="text-xl font-bold mb-4 text-white">Edit ticket</h2>
+
+  <form method="post" class="space-y-4" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <input
+      type="text"
+      name="titulo"
+      value="{{ chamado.titulo }}"
+      class="w-full border border-gray-600 p-2 rounded bg-gray-800 text-white"
+      required
+    >
+
+    <textarea
+      name="descricao"
+      class="w-full border border-gray-600 p-2 rounded bg-gray-800 text-white"
+      rows="4"
+      required
+    >{{ chamado.descricao }}</textarea>
+
+    <select
+      name="status"
+      class="w-full border border-gray-600 p-2 rounded bg-gray-800 text-white"
+    >
+      <option value="aberto" {% if chamado.status == 'aberto' %}selected{% endif %}>
+        Open
+      </option>
+      <option value="andamento" {% if chamado.status == 'andamento' %}selected{% endif %}>
+        In progress
+      </option>
+      <option value="fechado" {% if chamado.status == 'fechado' %}selected{% endif %}>
+        Closed
+      </option>
+    </select>
+
+    {% if chamado.anexo %}
+      <p class="text-white">
+        Current attachment: 
+        <a href="{{ chamado.anexo.url }}" target="_blank" class="underline text-blue-400">
+          View/Download
+        </a>
+      </p>
+    {% endif %}
+
+    <label for="anexo" class="text-white font-semibold">Change attachment (optional)</label>
+    <input
+      type="file"
+      name="anexo"
+      id="anexo"
+      class="w-full border border-gray-600 p-2 rounded bg-gray-800 text-white"
+    />
+
+    <div class="flex gap-3">
+      <button
+        type="submit"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Update
+      </button>
+
+<a href="{% url 'lista_chamados' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-flex items-center">
+  Back
+</a>
+    </div>
+  </form>
+</div>
+
+{% else %}
+
+<div class="max-w-xl mx-auto bg-red-900 border border-red-600
+            text-red-200 px-6 py-5 rounded-lg text-center font-semibold">
+   You do not have permission to edit this ticket.
+</div>
+
+{% endif %}
+
+{% endblock %}
